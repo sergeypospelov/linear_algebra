@@ -204,7 +204,117 @@ void task9_2() {
   cout << "Q^T * A * Q - A' =\n" << res.second.transpose() * A * res.second - res.first << "\n";
 }
 
+void task10_1() {
+  Matrix A({{1., 3, 3, 7},
+            {3, 4, 0, 9},
+            {3, 0, 0, 6},
+            {7, 9, 6, 9}});
+  auto res = tridiagonalization(A);
+  A = res.first; // tridiagonalized
+  cout << "tridiagonalized:\n";
+  cout << A << "\n";
 
+  auto res2 = eigen_qr_tridiagonalization(A);
+  if (res2.has_value()) {
+    cout << "eigen values:\n"
+         << res2.value().first << "\n";
+    cout << "eigen vectors:\n"
+         << res2.value().second << "\n";
+  } else {
+    cout << ":(\n";
+  }
+}
+
+void task10_2() {
+  Matrix A({{1., 2, 3, 4, 5},
+            {2, 2, 9, 16, 25},
+            {3, 9, 16, 64, 125},
+            {4, 16, 64, 256, 625},
+            {5, 25, 125, 625, 3125}});
+  auto res = tridiagonalization(A);
+  A = res.first; // tridiagonalized
+  cout << "tridiagonalized:\n";
+  cout << A << "\n";
+
+  auto res2 = eigen_qr_tridiagonalization(A);
+  if (res2.has_value()) {
+    cout << "eigen values:\n"
+         << res2.value().first << "\n";
+    cout << "eigen vectors:\n"
+         << res2.value().second << "\n";
+  } else {
+    cout << ":(\n";
+  }
+
+}
+
+/*
+ * Graph isomorphism test!
+ */
+
+void task12_1() {
+  int n = 7;
+  vector<pair<int, int>> edges1 = {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 1}}; // cycle
+  Matrix G1(n);
+  for (auto [u, v] : edges1) {
+    G1[u - 1][v - 1] = G1[v - 1][u - 1] = 1;
+  }
+
+  vector<int> perm(n);
+  for (int i = 0; i < n; i++) {
+    perm[i] = i;
+  }
+  shuffle(perm.begin(), perm.end(), mt19937());
+
+  Matrix G2(n);
+  for (auto [u, v] : edges1) {
+    int pu = perm[u - 1], pv = perm[v - 1];
+    G2[pu][pv] = G2[pv][pu] = 1;
+  }
+
+  vector eig_values1 = eigen_qr(G1).value().first;
+  sort(eig_values1.begin(), eig_values1.end());
+
+  vector eig_values2 = eigen_qr(G2).value().first;
+  sort(eig_values2.begin(), eig_values2.end());
+
+  bool possible_isomorphic = 1;
+  for (int i = 0; i < n; i++) {
+    possible_isomorphic &= is_zero(eig_values1[i] - eig_values2[i]);
+  }
+
+  cout << (possible_isomorphic ? "maybe" : "not") << "\n";
+}
+
+void task12_2() {
+  int n = 7;
+  vector<pair<int, int>> edges1 = {{1, 2}, {4,3}, {1, 4}, {6, 5}, {1, 6}, {1, 7}};
+  Matrix G1(n);
+  for (auto [u, v] : edges1) {
+    G1[u - 1][v - 1] = G1[v - 1][u - 1] = 1;
+  }
+
+  vector<pair<int, int>> edges2 = {{1, 2}, {1,3}, {1, 4}, {1, 5}, {1, 6}, {6, 7}}; // star with long path
+  Matrix G2(n);
+  for (auto [u, v] : edges2) {
+    G2[u - 1][v - 1] = G2[v - 1][u - 1] = 1;
+  }
+
+  cerr << G1 << "\n";
+
+  vector eig_values1 = eigen_qr(G1).value().first;
+  sort(eig_values1.begin(), eig_values1.end());
+
+  vector eig_values2 = eigen_qr(G2).value().first;
+  sort(eig_values2.begin(), eig_values2.end());
+
+  bool possible_isomorphic = 1;
+  for (int i = 0; i < n; i++) {
+    possible_isomorphic &= is_zero(eig_values1[i] - eig_values2[i]);
+  }
+
+  cout << (possible_isomorphic ? "maybe" : "not") << "\n";
+}
 
 int main() {
   //  task1();
@@ -212,13 +322,18 @@ int main() {
   //  task3();
 //    task4_1();
 //    task4_2();
-//  task4_3();
+//    task4_3();
   //  task6_1();
   //  task6_2();
   //  task7();
   //  task8();
   //  task9_1();
   //  task9_2();
+  //  task10_1();
+  //  task10_2();
+
+   // task12_1();
+     task12_2();
 
   return 0;
 }

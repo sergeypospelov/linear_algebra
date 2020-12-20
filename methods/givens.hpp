@@ -18,7 +18,7 @@ extern const double EPS;
 struct GivensMatrix {
   int i, j;
   double c, s;
-  GivensMatrix(int i, int j, double c, double s) : i(i), j(j), c(c / hypot(c, s)), s(s / hypot(c, s)) {
+  GivensMatrix(int i, int j, double xi, double xj) : i(i), j(j), c(xj / hypot(xi, xj)), s(-xi / hypot(xi, xj)) {
   }
   GivensMatrix() : i(0), j(0), c(0), s(1) {
   }
@@ -50,11 +50,11 @@ std::pair<Matrix<T>, Matrix<T>> QR_givens(const Matrix<T> &A) {
       continue;
     }
     for (int i = r + 1; i < n; i++) {
-      GivensMatrix G(r, i, A0[r][c], A0[i][c]);
+      GivensMatrix G(i, r, A0[i][c], A0[r][c]);
       A0 = G * A0;
       Q = G * Q;
     }
-    GivensMatrix G(c, r, 0, 1);
+    GivensMatrix G(r, c, 1, 0);
     A0 = G * A0;
     Q = G * Q;
   }

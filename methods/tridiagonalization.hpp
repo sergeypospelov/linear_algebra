@@ -6,6 +6,7 @@
 #define LINEAR_METHODS_TRIDIAGONALIZATION_HPP_
 
 #include "../core/util.hpp"
+#include "givens.hpp"
 #include "householder.hpp"
 
 namespace Linear {
@@ -35,16 +36,40 @@ std::pair<Matrix<T>, Matrix<T>> tridiagonalization(const Matrix<T> &A) {
 }
 
 template<typename T>
+std::pair<Matrix<T>, Matrix<T>> QR_givens_tridiagonalization(const Matrix<T> &A) { // A should be tridiagonalized
+  int n = A.n;
+  Matrix<T> A0 = A;
+  Matrix<T> Q = identity(n);
+  for (int c = 0; c < n; c++) {
+    int r = c;
+    while (r < std::min(c + 1, n) && is_zero(A0[r][c])) {
+      r++;
+    }
+    if (r == n) {
+      continue;
+    }
+    for (int i = r + 1; i < std::min(n, c + 2); i++) {
+      GivensMatrix G(r, i, A0[r][c], A0[i][c]);
+      A0 = G * A0;
+      Q = G * Q;
+    }
+    GivensMatrix G(c, r, 0, 1);
+    A0 = G * A0;
+    Q = G * Q;
+  }
+  return {Q.transpose(), A0};
+}
+
+template<typename T>
 std::optional<std::pair<std::vector<T>, Matrix<T>>> eigen_qr_tridiagonalization(const Matrix<T> &A, const double EPS = 1e-3) {
   int n = A.n;
   Matrix<T> Q = identity(n);
   auto cur_A = A;
   for (int i = 0; i < LIMIT; i++) {
-    auto [Q_new, R_new] = QR_givens(cur_A);
+    auto [Q_new, R_new] = QR_givens_tridiagonalization(cur_A); // O(n^2)
     cur_A = R_new * Q_new;
     Q *= Q_new;
-    Matrix<T> Ak = Q.transpose() * A * Q;
-    std::vector<std::pair<T, long double>> circles = gershgorin_circles(Ak);
+    std::vector<std::pair<T, long double>> circles = gershgorin_circles(cur_A); // O(n^2)
     long double rad = 0;
     for (auto &i : circles) {
       rad = std::max(rad, i.second);

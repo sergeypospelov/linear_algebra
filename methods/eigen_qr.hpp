@@ -21,8 +21,7 @@ std::optional<std::pair<std::vector<T>, Matrix<T>>> eigen_qr(const Matrix<T> &A,
     auto [Q_new, R_new] = QR_givens(cur_A);
     cur_A = R_new * Q_new;
     Q *= Q_new;
-    Matrix<T> Ak = Q.transpose() * A * Q;
-    std::vector<std::pair<T, long double>> circles = gershgorin_circles(Ak);
+    std::vector<std::pair<T, long double>> circles = gershgorin_circles(cur_A);
     long double rad = 0;
     for (auto &i : circles) {
       rad = std::max(rad, i.second);
