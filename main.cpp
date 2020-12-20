@@ -91,6 +91,18 @@ void task4_2() {
   cout << "A - QR = \n" << (A - res.first * res.second) << "\n";
 }
 
+void task4_3() {
+  Matrix A({{0., 0, 0, 1, 1},
+            {0., 2, 0, 0, 0},
+            {1., 4, 4, 5, 7},
+            {6., 0, 0, 0, 0},
+            {0., 0, 1, 5, 9}});
+  auto res = QR_givens(A);
+  cout << "Q =\n" << res.first << "R = \n";
+  cout << res.second << "\n";
+  cout << "A - QR = \n" << (A - res.first * res.second) << "\n";
+}
+
 void task5() {
   Matrix A({{1., 3, 3, 7},
             {2, 4, 0, 9},
@@ -198,14 +210,15 @@ int main() {
   //  task1();
   //  task2();
   //  task3();
-  //  task4_1();
-  //  task4_2();
+//    task4_1();
+//    task4_2();
+//  task4_3();
   //  task6_1();
   //  task6_2();
   //  task7();
   //  task8();
-    task9_1();
-    task9_2();
+  //  task9_1();
+  //  task9_2();
 
   return 0;
 }

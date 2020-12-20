@@ -46,12 +46,15 @@ std::pair<Matrix<T>, Matrix<T>> QR_givens(const Matrix<T> &A) {
     while (r < n && is_zero(A0[r][c])) {
       r++;
     }
+    if (r == n) {
+      continue;
+    }
     for (int i = r + 1; i < n; i++) {
       GivensMatrix G(r, i, A0[r][c], A0[i][c]);
       A0 = G * A0;
       Q = G * Q;
     }
-    GivensMatrix G(r, r, 0, 1);
+    GivensMatrix G(c, r, 0, 1);
     A0 = G * A0;
     Q = G * Q;
   }
