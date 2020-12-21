@@ -1,15 +1,16 @@
 #include "core/matrix.hpp"
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 
+#include "methods/eigen_qr.hpp"
+#include "methods/eigen_qr_shifts.hpp"
+#include "methods/eigen_simple_iteration.hpp"
+#include "methods/givens.hpp"
+#include "methods/householder.hpp"
 #include "methods/seidel.hpp"
 #include "methods/simple_iteration.hpp"
-#include "methods/givens.hpp"
-#include "methods/eigen_simple_iteration.hpp"
-#include "methods/householder.hpp"
-#include "methods/eigen_qr.hpp"
 #include "methods/tridiagonalization.hpp"
-#include "methods/eigen_qr_shifts.hpp"
 
 using namespace Linear;
 using namespace std;
@@ -322,6 +323,68 @@ void task12_0() {
   cout << res.value().first << " " << res.value().second << "\n";
 }
 
+
+void task13_1(int n) {
+  Matrix<double> G(n * n);
+
+  auto add = [&n, &G](int x, int y, int x2, int y2) {
+    x = (x % n + n) % n;
+    x2 = (x % n + n) % n;
+    y = (y % n + n) % n;
+    y2 = (y2 % n + n) % n;
+    G[x * n + y][x2 * n + y2]++;
+  };
+
+
+  for (int x = 0; x < n; x++) {
+    for (int y = 0; y < n; y++) {
+      add(x, y, x + 2 * y, y);
+      add(x, y, x - 2 * y, y);
+      add(x, y, x + 2 * y + 1, y);
+      add(x, y, x - 2 * y - 1, y);
+      add(x, y, x, y + 2 * x);
+      add(x, y, x, y - 2 * x);
+      add(x, y, x, y + 2 * x + 1);
+      add(x, y, x, y - 2 * x - 1);
+    }
+  }
+
+  vector eig_values = eigen_qr_shift(tridiagonalization(G).first, 0).value().first;
+  sort(eig_values.rbegin(), eig_values.rend());
+  cout << "eigen values:\n" << eig_values << "\n";
+
+  cout << "alpha = " << std::max(std::abs(eig_values[1]), std::abs(eig_values.back())) / 8 << "\n";
+}
+
+void task13_2(int p) { // p should be prime-number
+  Matrix<double> G(p + 1);
+  for (int i = 0; i < p; i++) {
+    if (i > 0) {
+      for (int j = 0; j < p; j++) {
+        if (i * j % p == 1) {
+          G[i][j]++;
+          break;
+        }
+      }
+    } else {
+      G[i][p]++;
+    }
+    G[i][(i + 1) % p]++;
+    G[i][(i - 1 + p) % p]++;
+  }
+  G[p][0] = 1;
+  G[p][p] = 2;
+  ofstream f_out;
+  f_out.open("matrix");
+  f_out << G;
+
+  vector eig_values = eigen_qr_shift(tridiagonalization(G).first).value().first;
+  sort(eig_values.rbegin(), eig_values.rend());
+  cout << "eigen values:\n" << eig_values << "\n";
+
+  cout << "alpha = " << std::max(std::abs(eig_values[1]), std::abs(eig_values.back())) / 3 << "\n";
+}
+
 int main() {
   cerr << fixed << setprecision(3);
 //  task1();
@@ -339,9 +402,14 @@ int main() {
 //  task10_1();
 //  task10_2();
 
-  task12_1();
-  task12_2();
-   //task12_0();
+//  task12_1();
+//  task12_2();
+//  task12_0();
+
+//  task13_1(10); // takes about 5 seconds for n = 10 and about 20 secs for n = 15
+//  task13_1(15);
+//  task13_1(20); // on my PC it took 3 minutes
+  task13_2(239);
 
   return 0;
 }
