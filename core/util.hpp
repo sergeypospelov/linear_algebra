@@ -206,6 +206,18 @@ bool is_symmetric(const Matrix<T> &A) {
   return true;
 }
 
+template <typename T>
+Matrix<T> drop_one(const Matrix<T> &A) {
+  int n = A.n - 1;
+  Matrix<T> res(n);
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      res[i][j] = A[i][j];
+    }
+  }
+  return res;
+}
+
 
 }// namespace Linear
 

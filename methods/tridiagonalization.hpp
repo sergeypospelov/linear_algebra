@@ -36,24 +36,25 @@ std::pair<Matrix<T>, Matrix<T>> tridiagonalization(const Matrix<T> &A) {
 }
 
 template<typename T>
-std::pair<Matrix<T>, Matrix<T>> QR_givens_tridiagonalization(const Matrix<T> &A) { // A should be tridiagonalized
+std::pair<Matrix<T>, Matrix<T>> QR_givens_tridiagonalization(const Matrix<T> &A, int Mx = -1) { // A should be tridiagonalized
   int n = A.n;
+  Mx = (Mx == -1 ? n : Mx);
   Matrix<T> A0 = A;
   Matrix<T> Q = identity(n);
-  for (int c = 0; c < n; c++) {
+  for (int c = 0; c < Mx; c++) {
     int r = c;
-    while (r < std::min(c + 1, n) && is_zero(A0[r][c])) {
+    while (r < std::min(c + 1, Mx) && is_zero(A0[r][c])) {
       r++;
     }
-    if (r == n) {
+    if (r == Mx) {
       continue;
     }
-    for (int i = r + 1; i < std::min(n, c + 2); i++) {
-      GivensMatrix G(r, i, A0[r][c], A0[i][c]);
+    for (int i = r + 1; i < std::min(Mx, c + 2); i++) {
+      GivensMatrix G(i, r, A0[i][c], A0[r][c]);
       A0 = G * A0;
       Q = G * Q;
     }
-    GivensMatrix G(c, r, 0, 1);
+    GivensMatrix G(r, c, 1, 0);
     A0 = G * A0;
     Q = G * Q;
   }

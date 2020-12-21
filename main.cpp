@@ -1,4 +1,5 @@
 #include "core/matrix.hpp"
+#include <iomanip>
 #include <iostream>
 
 #include "methods/seidel.hpp"
@@ -8,6 +9,7 @@
 #include "methods/householder.hpp"
 #include "methods/eigen_qr.hpp"
 #include "methods/tridiagonalization.hpp"
+#include "methods/eigen_qr_shifts.hpp"
 
 using namespace Linear;
 using namespace std;
@@ -272,10 +274,10 @@ void task12_1() {
     G2[pu][pv] = G2[pv][pu] = 1;
   }
 
-  vector eig_values1 = eigen_qr(G1).value().first;
+  vector eig_values1 = eigen_qr_shift(tridiagonalization(G1).first).value().first;
   sort(eig_values1.begin(), eig_values1.end());
 
-  vector eig_values2 = eigen_qr(G2).value().first;
+  vector eig_values2 = eigen_qr_shift(tridiagonalization(G2).first).value().first;
   sort(eig_values2.begin(), eig_values2.end());
 
   bool possible_isomorphic = 1;
@@ -300,12 +302,10 @@ void task12_2() {
     G2[u - 1][v - 1] = G2[v - 1][u - 1] = 1;
   }
 
-  cerr << G1 << "\n";
-
-  vector eig_values1 = eigen_qr(G1).value().first;
+  vector eig_values1 = eigen_qr_shift(tridiagonalization(G1).first).value().first;
   sort(eig_values1.begin(), eig_values1.end());
 
-  vector eig_values2 = eigen_qr(G2).value().first;
+  vector eig_values2 = eigen_qr_shift(tridiagonalization(G2).first).value().first;
   sort(eig_values2.begin(), eig_values2.end());
 
   bool possible_isomorphic = 1;
@@ -316,24 +316,32 @@ void task12_2() {
   cout << (possible_isomorphic ? "maybe" : "not") << "\n";
 }
 
-int main() {
-  //  task1();
-  //  task2();
-  //  task3();
-//    task4_1();
-//    task4_2();
-//    task4_3();
-  //  task6_1();
-  //  task6_2();
-  //  task7();
-  //  task8();
-  //  task9_1();
-  //  task9_2();
-  //  task10_1();
-  //  task10_2();
+void task12_0() {
+  Matrix A({{0, 1.0}, {1.0, 0.0}});
+  auto res = eigen_qr_shift(A);
+  cout << res.value().first << " " << res.value().second << "\n";
+}
 
-   // task12_1();
-     task12_2();
+int main() {
+  cerr << fixed << setprecision(3);
+//  task1();
+//  task2();
+//  task3();
+//  task4_1();
+//  task4_2();
+//  task4_3();
+//  task6_1();
+//  task6_2();
+//  task7();
+//  task8();
+//  task9_1();
+//  task9_2();
+//  task10_1();
+//  task10_2();
+
+  task12_1();
+  task12_2();
+   //task12_0();
 
   return 0;
 }
