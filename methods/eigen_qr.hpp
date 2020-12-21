@@ -11,6 +11,7 @@
 namespace Linear {
 
 extern const int ITERS;
+extern const int LIMIT;
 
 template<typename T>
 std::optional<std::pair<std::vector<T>, Matrix<T>>> eigen_qr(const Matrix<T> &A, const double EPS = 1e-3) {
